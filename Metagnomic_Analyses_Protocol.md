@@ -27,7 +27,7 @@ python3 interleave.py file_R1.fastq file_R1_fastq > interleaved.fastq
 ```
 
 b. If you have multiple fastq use this loop with nohup and a bash script.
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 for R1 in *_R1_001.fastq ; do python3 interleave_fastq.py $R1 "${R1/R1/R2}"  > $R1.interleave.fastq ; done 
 ```
 

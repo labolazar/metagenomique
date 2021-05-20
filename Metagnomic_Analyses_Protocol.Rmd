@@ -68,7 +68,7 @@ Transfer the HTML files from the fastqc directory to your computer in order to v
 
 ## Fastq to Fasta 
 
-Gzip the combined_trimmed.fastq file using and then convert them to fasta. I recommend using nohup and a bash script for both command since it can be very long. 
+Gzip the interleave and trimmed fastq file using Gzip and then convert them to fasta. I recommend using nohup and a bash script for both command since it can be very long. 
 ```{bash, eval=FALSE}
 #!/bin/bash
 gzip *.fastq

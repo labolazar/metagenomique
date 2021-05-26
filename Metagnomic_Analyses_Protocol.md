@@ -116,7 +116,8 @@ The lastest Python version accepted is 3.5, therefore you have to create a virtu
 git clone https://github.com/ablab/spades.git
 git checkout remotes/origin/spades_3.9.0
 
-conda activate envPython #for Python 3.5
+conda create -n envPython python=3.5
+conda activate envPython 
 
 spades.py --12 contig.fa --meta -o /home/.../.../SPAdes
 

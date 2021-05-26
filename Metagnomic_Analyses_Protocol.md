@@ -107,6 +107,24 @@ for i in *.fa
 done
 ``` 
 
+## SPAdes
+[Github](https://github.com/voutcn/megahit)
+
+The lastest Python version accepted is 3.5, therefore you have to create a virtual environment if you Python version is newer to use SPAdes v 3.9.0. The process takes a few minutes, nohup can be used but is optional. 
+
+```{bash, eval=FALSE}
+git clone https://github.com/ablab/spades.git
+git checkout remotes/origin/spades_3.9.0
+
+conda activate envPython #for Python 3.5
+
+spades.py --12 contig.fa --meta -o /home/.../.../SPAdes
+
+deactivate
+
+``` 
+
+
 ***
 
 # Post-Assembly stats 

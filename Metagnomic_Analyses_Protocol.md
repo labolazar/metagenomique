@@ -27,7 +27,7 @@ python3 interleave.py file_R1.fastq file_R1_fastq > interleaved.fastq
 ```
 
 b. If you have multiple fastq use this loop with nohup and a bash script.
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 for R1 in *_R1_001.fastq ; do python3 interleave_fastq.py $R1 "${R1/R1/R2}"  > $R1.interleave.fastq ; done 
 ```
 
@@ -60,7 +60,7 @@ done
 
 Run fastqc on the output (trimmed) file and the non-trimmed file. The process can take a lot of time so a recommend using `nohup`. 
 
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 #!/bin/bash 
 fastqc *.fastq --outdir=/home/kvilleneuve/Metagenomic_analyses/interleaved/fastqc
 ``` 
@@ -107,34 +107,60 @@ for i in *.fa
 done
 ``` 
 
+## SPAdes
+[Github](https://github.com/voutcn/megahit)
+
+The lastest Python version accepted is 3.5, therefore you have to create a virtual environment if you Python version is newer to use SPAdes v 3.9.0. The process takes a few minutes, nohup can be used but is optional. 
+
+```{bash, eval=FALSE}
+git clone https://github.com/ablab/spades.git
+git checkout remotes/origin/spades_3.9.0
+
+conda create -n envPython python=3.5
+path/to/python3.5 -m venv path/to/virtual/env
+source path/to/virtual/env/bin/activate  
+
+spades.py --12 contig.fa --meta -o /home/.../.../SPAdes
+
+deactivate
+
+``` 
+*For SPAdes v3.9.0, there is an error in ./spades_compile.sh when compiling the source code, but it is easily fixed by adding the following line in spades/assembler/src/modules/dev_support/segfault_handler.hpp
+
+```{bash, eval=FALSE}
+#include <functional> 
+``` 
+
+
 ***
+
 
 # Post-Assembly stats 
 
 ## Number of contigs 
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 grep -c ">" contig.fa 
 ```
 ## Lenght of contigs and histogram
 Use seqkit to extract the length of every contigs. Remove the first row of the document lengths (word length) using vi and use pipeline to create histogram with the lengths file. 
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 seqkit fx2tab --length --name --header-line contig.fa > length.tab 
 # Open length.tab  in vi or nano and delete the first row 
 cut -f 2 length.tab > lengths
 ```
 
 <font color='red'>*Eventually remove this*</font> Replace with a script giving : **1**. The total amount of sequence **2**. Sequence > 2kbp **3**. Sequences > 1kbp **4**. Threshold for GC content ? 
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 less lengths | Rscript -e 'data=abs(scan(file="stdin")); png("seq.png"); hist(data,xlab="sequences", breaks=250, xlim=c(0, 5000))'
 ```
 The output is a png file called “seq.png”. If x axis of the histogram is not right change the xlim=c(x,x) values. Copy the file to your local computer to view it (in your local computer terminal navigate to the local directory where you want the file to be copied)
 ## Lenght and GC 
 High GC organisms tend not to assemble well and may have an uneven read coverage distribution. I used this modified script `length+GC.pl`
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 perl length+GC.pl contig.fa > contig_GC.txt
 ```
 ## Keeping sequences above 2000 base pairs (2kbp -kilobase pairs)  
-``````{bash, eval=FALSE}
+```{bash, eval=FALSE}
 perl -lne 'if(/^(>.*)/){ $head=$1 } else { $fa{$head} .= $_ } END{ foreach $s (keys(%fa)){ print "$s\n$fa{$s}\n" if(length($fa{$s})>2000) }}' contig.fa > 2000bp.fa
 ``` 
 

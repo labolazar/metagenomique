@@ -117,16 +117,23 @@ git clone https://github.com/ablab/spades.git
 git checkout remotes/origin/spades_3.9.0
 
 conda create -n envPython python=3.5
-conda activate envPython 
+path/to/python3.5 -m venv path/to/virtual/env
+source path/to/virtual/env/bin/activate  
 
 spades.py --12 contig.fa --meta -o /home/.../.../SPAdes
 
 deactivate
 
 ``` 
+*For SPAdes v3.9.0, there is an error in ./spades_compile.sh when compiling the source code, but it is easily fixed by adding the following line in spades/assembler/src/modules/dev_support/segfault_handler.hpp
+
+```{bash, eval=FALSE}
+#include <functional> 
+``` 
 
 
 ***
+
 
 # Post-Assembly stats 
 

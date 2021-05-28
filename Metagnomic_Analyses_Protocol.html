@@ -7,7 +7,7 @@
 
         <meta name="author" content="Karine Villeneuve" />
     
-        <meta name="date" content="2021-05-20" />
+        <meta name="date" content="2021-05-27" />
     
     <title>Protocol for metagenomic analyses</title>
 
@@ -1803,6 +1803,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </ul>
         <nav role="navigation" id="toc">
           <ul>
+          <li><a href="#read-me">Read me</a></li>
           <li><a href="#pre-assembly">Pre-Assembly</a><ul>
           <li><a href="#unzip">Unzip</a></li>
           <li><a href="#interleaving">Interleaving</a></li>
@@ -1813,16 +1814,25 @@ document.addEventListener('DOMContentLoaded', function() {
           <li><a href="#assembly">Assembly</a><ul>
           <li><a href="#idba">IDBA</a></li>
           <li><a href="#megahit">Megahit</a></li>
+          <li><a href="#metaspades">Metaspades</a></li>
+          <li><a href="#spades">Spades</a></li>
           </ul></li>
           <li><a href="#post-assembly-stats">Post-Assembly stats</a><ul>
           <li><a href="#number-of-contigs">Number of contigs</a></li>
           <li><a href="#lenght-of-contigs-and-histogram">Lenght of contigs and histogram</a></li>
+          <li><a href="#lenght-and-gc">Lenght and GC</a></li>
           <li><a href="#keeping-sequences-above-2000-base-pairs-2kbp--kilobase-pairs">Keeping sequences above 2000 base pairs (2kbp -kilobase pairs)</a></li>
           </ul></li>
-          <li><a href="#binning">Binning</a></li>
+          <li><a href="#binning">Binning</a><ul>
+          <li><a href="#mapping">Mapping</a></li>
+          <li><a href="#depth-file">Depth file</a></li>
+          <li><a href="#metabat">MetaBAT</a></li>
+          </ul></li>
           <li><a href="#bin-quality">Bin quality</a></li>
           <li><a href="#bin-cleaning">Bin cleaning</a></li>
-          <li><a href="#taxonomy">Taxonomy</a></li>
+          <li><a href="#taxonomy">Taxonomy</a><ul>
+          <li><a href="#gtdbtk">GTDBTK</a></li>
+          </ul></li>
           <li><a href="#phylogenetic-tree">Phylogenetic tree</a></li>
           <li><a href="#metabolic-pathway">Metabolic pathway</a></li>
           <li><a href="#other-information">Other information</a><ul>
@@ -1834,7 +1844,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <ul class="authors">
           <li class="divider"></li>
                                 <li><span><i class="glyphicon glyphicon-user"></i> Karine Villeneuve</span></li>
-                                         <li><span><i class="glyphicon glyphicon-calendar"></i> 2021-05-20</span></li>
+                                         <li><span><i class="glyphicon glyphicon-calendar"></i> 2021-05-27</span></li>
                   </ul>     
       </div>
       <div class="book-body fixed">
@@ -1854,28 +1864,39 @@ document.addEventListener('DOMContentLoaded', function() {
       
    
 <!-- Don't indent these lines or it will mess pre blocks indentation --> 
+<div id="read-me" class="section level1">
+<h1>Read me</h1>
+<p>This protocol was created with the help of the baker lab team. Most of the programs are already installed on our server thanks to Mélanie Dominique and Karine Villeneuve.</p>
+<p>This protocol is intended to guide you through the different steps required to assemble and annotate reads from shotgun sequencing.</p>
+<p>Some program may take some time to process, we therefor recommend running the command using a shell script with nohup. Exemple :</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">vi</span> mapping.sh <span class="co"># This creates a blank document in a vi text editor that is called mapping.sh to start editing the document press i </span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">nohup</span> ./mapping.sh <span class="kw">&amp;</span> </span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>Create a vi document called /mapping.sh &amp;</li>
+</ol>
+</div>
 <div id="pre-assembly" class="section level1">
 <h1>Pre-Assembly</h1>
 <div id="unzip" class="section level2">
 <h2>Unzip</h2>
 <p>Open a terminal window and move to the folder with your raw <code>fastq.gz</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">gunzip</span> *.gz</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">gunzip</span> *.gz</span></code></pre></div>
 </div>
 <div id="interleaving" class="section level2">
 <h2>Interleaving</h2>
 <p>I used the script <font color="green">interleave.py</font> from this <a href="https://gist.github.com/ngcrawford/2232505">GitHub gist</a>. The script is currently available in the folder <code>Script Métagénomique</code> of our Teams (see <code>General</code>). Transfer the script to the folder with the fastq files on the server, make the script executable and run the script using python.</p>
 <p>Make the script executable and chose option <strong>a</strong> or <strong>b</strong> depending on the amount of fastq you have.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">chmod</span> +x interleave.py</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">chmod</span> +x interleave.py</span></code></pre></div>
 <ol style="list-style-type: lower-alpha">
 <li>If you have only a few fastq use this simple command line.</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">python3</span> interleave.py file_R1.fastq file_R1_fastq <span class="op">&gt;</span> interleaved.fastq</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">python3</span> interleave.py file_R1.fastq file_R1_fastq <span class="op">&gt;</span> interleaved.fastq</span></code></pre></div>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>If you have multiple fastq use this loop with nohup and a bash script.</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">for</span> <span class="ex">R1</span> in *_R1_001.fastq <span class="kw">;</span> <span class="kw">do</span> <span class="ex">python3</span> interleave_fastq.py <span class="va">$R1</span> <span class="st">&quot;</span><span class="va">${R1/</span>R1<span class="va">/</span>R2<span class="va">}</span><span class="st">&quot;</span>  <span class="op">&gt;</span> <span class="va">$R1</span>.interleave.fastq <span class="kw">;</span> <span class="kw">done</span> </span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">for</span> <span class="ex">R1</span> in *_R1_001.fastq <span class="kw">;</span> <span class="kw">do</span> <span class="ex">python3</span> interleave_fastq.py <span class="va">$R1</span> <span class="st">&quot;</span><span class="va">${R1/</span>R1<span class="va">/</span>R2<span class="va">}</span><span class="st">&quot;</span>  <span class="op">&gt;</span> <span class="va">$R1</span>.interleave.fastq <span class="kw">;</span> <span class="kw">done</span> </span></code></pre></div>
 <p>View the top of the new interleaved files to make sure your reads alternate between R1 and R2.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">grep</span> @M interleaved.fastq <span class="kw">|</span> <span class="fu">head</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">grep</span> @M interleaved.fastq <span class="kw">|</span> <span class="fu">head</span></span></code></pre></div>
 <p>I recommend moving all the interleaved fastq to a new folder (I called the new folder <code>interleaved</code>)</p>
 <p><font color="red"><em>I am looking for a better way to rename the interleave file from the loop. But this will do for now.</em></font></p>
 </div>
@@ -1883,49 +1904,57 @@ document.addEventListener('DOMContentLoaded', function() {
 <h2>Sickle</h2>
 <p>Sickle is a tool that uses sliding windows along with quality and length thresholds to determine when quality is sufficiently low to trim the 3’-end of reads and also determines when the quality is sufficiently high enough to trim the 5’-end of reads. It generates two files for each fastq you input : <code>.trim.fastq</code> and <code>.singles.fastq</code>. We only need the <code>.trim.fastq</code> and therefor you can move all the others to another folder.</p>
 <p>Running sickle with a bash script.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.fastq</span>
-<span id="cb6-3"><a href="#cb6-3"></a>  <span class="kw">do</span> <span class="ex">sickle</span> pe -c <span class="va">$i</span> -t sanger -m <span class="va">$i</span>.trim.fastq -s <span class="va">$i</span>.singles.fastq</span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="kw">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.fastq</span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="kw">do</span> <span class="ex">sickle</span> pe -c <span class="va">$i</span> -t sanger -m <span class="va">$i</span>.trim.fastq -s <span class="va">$i</span>.singles.fastq</span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="kw">done</span></span></code></pre></div>
 <p><em>sickle pe (paired end) -c (inputfile) -t sanger (from illumina) -m (outputfilename) -s (exclutedreadsfilename)</em></p>
 </div>
 <div id="quality-check-with-fastqc" class="section level2">
 <h2>Quality check with Fastqc</h2>
 <p>Run fastqc on the output (trimmed) file and the non-trimmed file. The process can take a lot of time so a recommend using <code>nohup</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">#!/bin/bash </span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="ex">fastqc</span> *.fastq --outdir=/home/kvilleneuve/Metagenomic_analyses/interleaved/fastqc</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">#!/bin/bash </span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="ex">fastqc</span> *.fastq --outdir=/home/kvilleneuve/Metagenomic_analyses/interleaved/fastqc</span></code></pre></div>
 <p>Transfer the HTML files from the fastqc directory to your computer in order to view them in your a browser.</p>
 </div>
 <div id="fastq-to-fasta" class="section level2">
 <h2>Fastq to Fasta</h2>
-<p>Gzip the interleave and trimmed fastq file using Gzip and then convert them to fasta. I recommend using nohup and a bash script for both command since it can be very long.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">gzip</span> *.fastq</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.gz <span class="kw">;</span> </span>
-<span id="cb9-3"><a href="#cb9-3"></a>  <span class="kw">do</span> <span class="ex">seqtk</span> seq -a <span class="va">$i</span> <span class="op">&gt;</span> <span class="va">$i</span>.fa <span class="kw">;</span> </span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">done</span> </span></code></pre></div>
+<p>Copy the interleave and trimmed fastq file to a new folder and then Gzip all and then convert them to fasta. I recommend using nohup and a bash script for both command since it can be very long.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="fu">gzip</span> *.fastq</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.gz <span class="kw">;</span> </span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="kw">do</span> <span class="ex">seqtk</span> seq -a <span class="va">$i</span> <span class="op">&gt;</span> <span class="va">$i</span>.fa <span class="kw">;</span> </span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">done</span> </span></code></pre></div>
 <hr />
 </div>
 </div>
 <div id="assembly" class="section level1">
 <h1>Assembly</h1>
 <p>For the moment, there is no way of knowing which assembly program is best suited for your sample. Therefor, I try the different assemblers and look at (1) the output number of contigs, (2) the number of contigs &gt; 2000 bp and (3) the number of contigs &gt; 1000 bp. Because the assembly process is quite long I always use nohup.</p>
+<p><a href="https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3918-9">Further reading</a></p>
 <div id="idba" class="section level2">
 <h2>IDBA</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.fa</span>
-<span id="cb10-3"><a href="#cb10-3"></a>  <span class="kw">do</span> <span class="ex">idba_ud</span> -l <span class="va">$i</span> -o <span class="va">$i</span>.assembly --pre_correction --mink 65 --maxk 115 --step 10 --seed_kmer 55 i--num_threads 20</span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">done</span></span></code></pre></div>
+<p><a href="https://github.com/loneknightpy/idba">Github</a></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.fa</span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="kw">do</span> <span class="ex">idba_ud</span> -l <span class="va">$i</span> -o <span class="va">$i</span>.assembly --pre_correction --mink 65 --maxk 115 --step 10 --seed_kmer 55 i--num_threads 20</span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="kw">done</span></span></code></pre></div>
 <p>The output is a new folder ending in <code>assembly</code> for each of our file. In this folder we are interested in the file called <code>contig.fa</code>.</p>
 </div>
 <div id="megahit" class="section level2">
 <h2>Megahit</h2>
 <p><a href="https://github.com/voutcn/megahit">Github</a></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.fa</span>
-<span id="cb11-3"><a href="#cb11-3"></a>  <span class="kw">do</span> <span class="ex">megahit</span> --12 <span class="va">$i</span> --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 25 -o ~/Metagenomic_analyses/fasta/meg_<span class="va">$i</span> --out-prefix megahit_<span class="va">$i</span>  </span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">for</span> <span class="ex">i</span> in *.fa</span>
+<span id="cb13-3"><a href="#cb13-3"></a>  <span class="kw">do</span> <span class="ex">megahit</span> --12 <span class="va">$i</span> --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 25 -o ~/Metagenomic_analyses/fasta/meg_<span class="va">$i</span> --out-prefix megahit_<span class="va">$i</span>  </span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="kw">done</span></span></code></pre></div>
+</div>
+<div id="metaspades" class="section level2">
+<h2>Metaspades</h2>
+</div>
+<div id="spades" class="section level2">
+<h2>Spades</h2>
 <hr />
 </div>
 </div>
@@ -1933,35 +1962,110 @@ document.addEventListener('DOMContentLoaded', function() {
 <h1>Post-Assembly stats</h1>
 <div id="number-of-contigs" class="section level2">
 <h2>Number of contigs</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">grep</span> -c <span class="st">&quot;&gt;&quot;</span> contig.fa </span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">grep</span> -c <span class="st">&quot;&gt;&quot;</span> contig.fa </span></code></pre></div>
 </div>
 <div id="lenght-of-contigs-and-histogram" class="section level2">
 <h2>Lenght of contigs and histogram</h2>
 <p>Use seqkit to extract the length of every contigs. Remove the first row of the document lengths (word length) using vi and use pipeline to create histogram with the lengths file.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="ex">seqkit</span> fx2tab --length --name --header-line contig.fa <span class="op">&gt;</span> length.tab </span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="co"># Open length.tab  in vi or nano and delete the first row </span></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="fu">cut</span> -f 2 length.tab <span class="op">&gt;</span> lengths</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1"></a><span class="ex">seqkit</span> fx2tab --length --name --header-line contig.fa <span class="op">&gt;</span> length.tab </span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="co"># Open length.tab  in vi or nano and delete the first row </span></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">cut</span> -f 2 length.tab <span class="op">&gt;</span> lengths</span></code></pre></div>
 <p><font color="red"><em>Eventually remove this</em></font> Replace with a script giving : <strong>1</strong>. The total amount of sequence <strong>2</strong>. Sequence &gt; 2kbp <strong>3</strong>. Sequences &gt; 1kbp <strong>4</strong>. Threshold for GC content ?</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">less</span> lengths <span class="kw">|</span> <span class="ex">Rscript</span> -e <span class="st">&#39;data=abs(scan(file=&quot;stdin&quot;)); png(&quot;seq.png&quot;); hist(data,xlab=&quot;sequences&quot;, breaks=250, xlim=c(0, 5000))&#39;</span></span></code></pre></div>
-<p>The output is a png file called “seq.png”. If x axis of the histogram is not right change the xlim=c(x,x) values. Copy the file to your local computer to view it (in your local computer terminal navigate to the local directory where you want the file to be copied) ## Lenght and GC High GC organisms tend not to assemble well and may have an uneven read coverage distribution. I used this modified script <code>length+GC.pl</code></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">perl</span> length+GC.pl contig.fa <span class="op">&gt;</span> contig_GC.txt</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">less</span> lengths <span class="kw">|</span> <span class="ex">Rscript</span> -e <span class="st">&#39;data=abs(scan(file=&quot;stdin&quot;)); png(&quot;seq.png&quot;); hist(data,xlab=&quot;sequences&quot;, breaks=250, xlim=c(0, 5000))&#39;</span></span></code></pre></div>
+<p>The output is a png file called “seq.png”. If x axis of the histogram is not right change the xlim=c(x,x) values. Copy the file to your local computer to view it (in your local computer terminal navigate to the local directory where you want the file to be copied)</p>
+</div>
+<div id="lenght-and-gc" class="section level2">
+<h2>Lenght and GC</h2>
+<p>High GC organisms tend not to assemble well and may have an uneven read coverage distribution. I used this modified script <code>length+GC.pl</code></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">perl</span> length+GC.pl contig.fa <span class="op">&gt;</span> contig_GC.txt</span></code></pre></div>
 </div>
 <div id="keeping-sequences-above-2000-base-pairs-2kbp--kilobase-pairs" class="section level2">
 <h2>Keeping sequences above 2000 base pairs (2kbp -kilobase pairs)</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">perl</span> -lne <span class="st">&#39;if(/^(&gt;.*)/){ $head=$1 } else { $fa{$head} .= $_ } END{ foreach $s (keys(%fa)){ print &quot;$s\n$fa{$s}\n&quot; if(length($fa{$s})&gt;2000) }}&#39;</span> contig.fa <span class="op">&gt;</span> 2000bp.fa</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">perl</span> -lne <span class="st">&#39;if(/^(&gt;.*)/){ $head=$1 } else { $fa{$head} .= $_ } END{ foreach $s (keys(%fa)){ print &quot;$s\n$fa{$s}\n&quot; if(length($fa{$s})&gt;2000) }}&#39;</span> contig.fa <span class="op">&gt;</span> 2000bp.fa</span></code></pre></div>
 </div>
 </div>
 <div id="binning" class="section level1">
 <h1>Binning</h1>
+<p>Coverage-based binning approaches will require you to map reads to assembled contigs</p>
+<div id="mapping" class="section level2">
+<h2>Mapping</h2>
+<p><a href="https://github.com/imrambo/genome_mapping">Github</a></p>
+<p>This wrapper maps <strong>FASTQ</strong> reads against an assembly (e.g. genome) in <strong>FASTA</strong> format using BWA-MEM</p>
+<p>For each sample, create a folder and copy into this folder these two files : the <strong>long contig.fa</strong> (1000 or 2000 bp) and the <strong>trim and interleaved fastq</strong> (fastq after sickle)</p>
+<ol style="list-style-type: decimal">
+<li>Go to your home directory and clone the git repository</li>
+</ol>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">git</span> clone https://github.com/imrambo/genome_mapping.git</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Go to the new directory created `genome_mapping° and create a conda environment</li>
+</ol>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1"></a><span class="ex">conda</span> env create -f environment_linux64.yml</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Activate the conda environement</li>
+</ol>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1"></a><span class="ex">conda</span> activate scons_map</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Run a dry run to ensure everything runs smoothly</li>
+</ol>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1"></a><span class="ex">scons</span>  --dry-run --fastq_dir=/home/karine/VP/megahit/concat --assembly=/home/karine/VP/megahit/concat/concatenated_1kb.fa --outdir=/home/karine/VP/megahit/concat/map --sampleids=fastq_concat.fastq --align_thread=5 --samsort_thread=5 --samsort_mem=768M --nheader=8 --tmpdir=/home/karine/tmp --logfile=concat.log</span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>Run the script</li>
+</ol>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1"></a><span class="ex">scons</span>  --fastq_dir=/home/karine/VP/SV10 --assembly=/home/karine/VP/SV10/SV10_1kb.fa --outdir=/home/karine/VP/SV10_map --sampleids=SV10_combined --align_thread=5 --samsort_thread=5 --samsort_mem=768M --nheader=8 --tmpdir=/home/karine/tmp --logfile=SV10log</span></code></pre></div>
+<p>In the outpir directory created you will find a file that ends with <code>.sorted.bam</code> which we will need to create the depth file</p>
+</div>
+<div id="depth-file" class="section level2 tabset">
+<h2>Depth file</h2>
+<p>The depth allows you to know how many sequence you can align with certain sections of your contigs. Section with very little depth (few sequences) are not reputable to use</p>
+</div>
+<div id="metabat" class="section level2">
+<h2>MetaBAT</h2>
+<p><a href="https://peerj.com/articles/1165/">MetaBAT</a></p>
+<p>Efficient tool for accurately reconstructing single genomes from complex microbial communities</p>
+<ol style="list-style-type: lower-alpha">
+<li>Create <code>vi</code> file named <code>run_metabat.sh</code> with the following command</li>
+</ol>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="ex">metabat2</span> -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000</span></code></pre></div>
+<p><code>minCVsum</code> : assigning number of tetranucleotide frequency graphs, don’t grab negative numbers <code>-m</code> : min size of contig to be considered for binning</p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Run Metabat using <code>nohup ./</code>and <code>&amp;</code></li>
+</ol>
+<p>The output is a folder called <code>bins_dir</code> containing all the bins created</p>
+</div>
 </div>
 <div id="bin-quality" class="section level1">
 <h1>Bin quality</h1>
+<p><a href="https://github.com/Ecogenomics/CheckM/wiki">Github</a></p>
+<p>I downloaded the <a href="https://data.ace.uq.edu.au/public/CheckM_databases/">checkm databases</a> and moved them to /usr/local/lib/checkm. I decompressed the file using <code>sudo tar -xf checkm_data_2015_01_16.tar.gz</code>. I changed the File Ownership to root <code>sudo chown -R root /usr/local/lib/checkm</code> and Group Ownership to me <code>sudo chgrp kvilleneuve /usr/local/lib/checkm</code>. I ran the following to inform CheckM of where the files have been placed: <code>checkm data setRoot /usr/local/lib/checkm</code></p>
+<p>You have to go back one folder in the terminal (not be in the bins_dir folder)</p>
+<p>you need to specify the extension of your file for it to work. For example, for file finishing is <code>.fa</code> the command will be <code>checkm lineage_wf -x fa</code>…</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1"></a><span class="ex">checkm</span> lineage_wf -x fa bins_dir/ bins_dir/checkm -f bins_dir/output.txt</span></code></pre></div>
+<ol style="list-style-type: lower-alpha">
+<li>Open the <code>output.txt</code> document with excel to verify the <strong>completeness</strong> and <strong>contamination</strong> of your bins</li>
+</ol>
+<ul>
+<li>Standard : Completeness &gt; 50 % and Contamination &lt; 10 %</li>
+</ul>
+<ol start="2" style="list-style-type: lower-alpha">
+<li><p>Remove all the spaces with <code>control</code> + <code>H</code></p></li>
+<li><p>Filter the columns by Completeness, and seperate the ones &lt; 50 % by adding a line in excel</p></li>
+<li><p>Filter by Contamination, and highlight all the ones &gt; 10 % - These are the bins you want to clean</p></li>
+</ol>
 </div>
 <div id="bin-cleaning" class="section level1">
 <h1>Bin cleaning</h1>
 </div>
 <div id="taxonomy" class="section level1">
 <h1>Taxonomy</h1>
+<div id="gtdbtk" class="section level2">
+<h2>GTDBTK</h2>
+<p><a href="https://github.com/Ecogenomics/GTDBTk/blob/stable/README.md">Github</a></p>
+<p>In the folder with all your clean and completed genomes run this command with nohup</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a><span class="ex">gtdbtk</span> classify_wf --cpus 20 --genome_dir /home/karine/Bins/all_clean --out_dir gtdbk_output</span></code></pre></div>
+<p>Once it is done running, you can open the folder called <code>gtdbk_output</code> and copy the folder <code>gtdbtk.bac120.summary.tsv</code> to your local computer in order to open it with excel. Use this folder to identify the phylum, class, order, family and genus that you need to download in order to construct your tree.</p>
+</div>
 </div>
 <div id="phylogenetic-tree" class="section level1">
 <h1>Phylogenetic tree</h1>

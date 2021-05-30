@@ -11,16 +11,7 @@ This protocol was created with the help of the baker lab team. Most of the progr
 
 This protocol is intended to guide you through the different steps required to assemble and annotate reads from shotgun sequencing. 
 
-Some program may take some time to process, we therefor recommend running the command using a shell script with nohup. Exemple : 
-```{bash, eval=FALSE}
-vi mapping.sh # This creates a blank document in a vi text editor that is called mapping.sh to start editing the document press i 
-```
-
-```{bash, eval=FALSE}
-nohup ./mapping.sh & 
-``` 
-
-1. Create a vi document called /mapping.sh & 
+Some program may take some time to process, we therefor recommend running the command using a shell script with nohup. For exemple on how to use, see section `Nohup`. 
 
 # Pre-Assembly 
 
@@ -293,6 +284,30 @@ Once it is done running, you can open the folder called `gtdbk_output` and copy 
 
 New approaches for metagenome assembly with short reads. [Article](https://academic.oup.com/bib/article/21/2/584/5363831) by Ayling *et al.*, 2019. 
 
+# Nohup 
 
+Say you want to run the following command : `metabat2 -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000` 
 
+1. Create a vi document called `mapping.sh` with the following commmand : 
+```{bash, eval=FALSE}
+vi mapping.sh 
+```
+2. This creates a blank document in a vi text editor that is called `mapping.sh`. To start editing the document press `i`. Write the following command : 
+```{bash, eval=FALSE}
+#!/bin/bash 
+metabat2 -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000
+```
+3. To exit the vi document press the following keys `esc` , `:` , `w` , `q` 
+
+4. Make the shell executable
+```{bash, eval=FALSE}
+chmod +x mapping.sh 
+``` 
+5. Run the shell script 
+```{bash, eval=FALSE}
+nohup ./mapping.sh & 
+``` 
+6. Press `enter` twice
+
+If nohup exits there is likely a problem with the command you wrote in your shell script. To see the verbose and identify the source of the error open the `nohup.out` file (`less nohup.out`). To see if your task is still running use the command `jobs` 
 

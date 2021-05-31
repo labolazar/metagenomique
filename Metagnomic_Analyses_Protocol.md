@@ -165,6 +165,48 @@ perl -lne 'if(/^(>.*)/){ $head=$1 } else { $fa{$head} .= $_ } END{ foreach $s (k
 ``` 
 
 # Binning 
+Coverage-based binning approaches will require you to map reads to assembled contigs
+
+## Mapping 
+[Github](https://github.com/imrambo/genome_mapping)
+This wrapper maps **FASTQ** reads against an assembly (e.g. genome) in **FASTA** format using BWA-MEM
+For each sample, create a folder and copy into this folder these two files : the **long contig.fa** (1000 or 2000 bp) and the **trim and interleaved fastq** (fastq after sickle)
+1. Go to your home directory and clone the git repository 
+```{bash, highlight=TRUE, eval=FALSE}
+git clone https://github.com/imrambo/genome_mapping.git
+```
+2. Go to the new directory created `genome_mapping° and create a conda environment 
+```{bash, highlight=TRUE, eval=FALSE}
+conda env create -f environment_linux64.yml
+```
+3. Activate the conda environement
+```{bash, highlight=TRUE, eval=FALSE}
+conda activate scons_map
+```
+3. Run a dry run to ensure everything runs smoothly  
+```{bash, highlight=TRUE, eval=FALSE}
+scons  --dry-run --fastq_dir=/home/karine/VP/megahit/concat --assembly=/home/karine/VP/megahit/concat/concatenated_1kb.fa --outdir=/home/karine/VP/megahit/concat/map --sampleids=fastq_concat.fastq --align_thread=5 --samsort_thread=5 --samsort_mem=768M --nheader=8 --tmpdir=/home/karine/tmp --logfile=concat.log
+```
+4. Run the script 
+```{bash, highlight=TRUE, eval=FALSE}
+scons  --fastq_dir=/home/karine/VP/SV10 --assembly=/home/karine/VP/SV10/SV10_1kb.fa --outdir=/home/karine/VP/SV10_map --sampleids=SV10_combined --align_thread=5 --samsort_thread=5 --samsort_mem=768M --nheader=8 --tmpdir=/home/karine/tmp --logfile=SV10log
+```
+In the outpir directory created  you will find a file that ends with `.sorted.bam` which we will need to create the depth file 
+## Depth file {.tabset}
+The depth allows you to know how many sequence you can align with certain sections of your contigs. Section with very little depth (few sequences) are not reputable to use
+## MetaBAT 
+[MetaBAT](https://peerj.com/articles/1165/)
+Efficient tool for accurately reconstructing single genomes from complex microbial communities
+a. Create `vi` file named `run_metabat.sh` with the following command
+```{bash, highlight=TRUE, eval=FALSE}
+#!/bin/bash
+metabat2 -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000
+```
+`minCVsum` : assigning number of tetranucleotide frequency graphs, don’t grab negative numbers 
+`-m` : min size of contig to be considered for binning
+b. Run Metabat using `nohup ./`and `&`
+The output is a folder called `bins_dir` containing all the bins created 
+
 
 # Bin quality 
 

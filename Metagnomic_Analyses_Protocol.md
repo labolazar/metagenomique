@@ -210,9 +210,65 @@ The output is a folder called `bins_dir` containing all the bins created
 
 # Bin quality 
 
+[Github](https://github.com/Ecogenomics/CheckM/wiki)
+I downloaded the [checkm databases](https://data.ace.uq.edu.au/public/CheckM_databases/) and moved them to /usr/local/lib/checkm. I decompressed the file using `sudo tar -xf checkm_data_2015_01_16.tar.gz`. I changed the File Ownership to root `sudo chown -R root /usr/local/lib/checkm` and Group Ownership to me `sudo chgrp kvilleneuve /usr/local/lib/checkm`. I ran the following to inform CheckM of where the files have been placed: `checkm data setRoot /usr/local/lib/checkm`
+You have to go back one folder in the terminal (not be in the bins_dir folder)
+you  need to specify the extension of your file for it to work. For example, for file finishing is `.fa` the command will be `checkm lineage_wf -x fa`... 
+```{bash, highlight=TRUE, eval=FALSE}
+checkm lineage_wf -x fa bins_dir/ bins_dir/checkm -f bins_dir/output.txt
+```
+a. Open the `output.txt` document with excel to verify the **completeness** and **contamination** of your bins 
+- Standard : Completeness > 50 % and Contamination < 10 % 
+b. Remove all the spaces with `control` + `H`
+c. Filter the columns by Completeness, and seperate the ones < 50 % by adding a line in excel 
+d. Filter by Contamination, and highlight all the ones > 10 % - These are the bins you want to clean
+
 # Bin cleaning 
 
 # Taxonomy 
+
+## GTDBTK
+[Github](https://github.com/Ecogenomics/GTDBTk)
+I located the folder with the untar GTDBTK data (GTDBTk_data/release95) and I added the path to this file to my ~/.profile (using vi)
+```{bash, highlight=TRUE, eval=FALSE}
+export GTDBTK_DATA_PATH=/home/kvilleneuve/GTDBTk_data/release95
+```
+In the folder with all your clean and completed genomes run this command with nohup
+```{bash, highlight=TRUE, eval=FALSE}
+#!/bin/bash
+gtdbtk classify_wf --cpus 20 --genome_dir /home/karine/Bins/all_clean --out_dir gtdbk_output -x fa
+```
+Once it is done running, you can open the folder called `gtdbk_output` and copy the folder `gtdbtk.bac120.summary.tsv` to your local computer in order to open it with excel. Use this folder to identify the phylum, class, order, family and genus that you need to download in order to construct your tree. 
+# Phylogenetic tree 
+# Metabolic pathway 
+# Other information 
+## Workflow (alternative)
+[iMetAMOS](https://metamos.readthedocs.io/en/v1.5rc3/content/workflows.html)
+## Articles 
+New approaches for metagenome assembly with short reads. [Article](https://academic.oup.com/bib/article/21/2/584/5363831) by Ayling *et al.*, 2019. 
+# Nohup 
+Say you want to run the following command : `metabat2 -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000` 
+1. Create a vi document called `mapping.sh` with the following commmand : 
+```{bash, eval=FALSE}
+vi mapping.sh 
+```
+2. This creates a blank document in a vi text editor that is called `mapping.sh`. To start editing the document press `i`. Write the following command : 
+```{bash, eval=FALSE}
+#!/bin/bash 
+metabat2 -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000
+```
+3. To exit the vi document press the following keys `esc` , `:` , `w` , `q` 
+4. Make the shell executable
+```{bash, eval=FALSE}
+chmod +x mapping.sh 
+``` 
+5. Run the shell script 
+```{bash, eval=FALSE}
+nohup ./mapping.sh & 
+``` 
+6. Press `enter` twice
+If nohup exits there is likely a problem with the command you wrote in your shell script. To see the verbose and identify the source of the error open the `nohup.out` file (`less nohup.out`). To see if your task is still running use the command `jobs` 
+
 
 # Phylogenetic tree 
 

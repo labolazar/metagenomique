@@ -88,6 +88,7 @@ done
 For the moment, there is no way of knowing which assembly program is best suited for your sample. Therefor, I try the different assemblers and look at (1) the output number of contigs, (2) the number of contigs > 2000 bp and (3) the number of contigs > 1000 bp. Because the assembly process is quite long I always use nohup. 
 
 ## IDBA 
+*It seems to be the method that gives the bests results for the assembly.
 
 ```{bash, eval=FALSE}
 #!/bin/bash
@@ -108,7 +109,7 @@ done
 ``` 
 
 ## SPAdes
-[Github](https://github.com/voutcn/megahit)
+[Github](https://github.com/ablab/spades)
 
 The lastest Python version accepted is 3.5, therefore you have to create a virtual environment if you Python version is newer to use SPAdes v 3.9.0. The process takes a few minutes, nohup can be used but is optional. 
 
@@ -200,7 +201,7 @@ Efficient tool for accurately reconstructing single genomes from complex microbi
 a. Create `vi` file named `run_metabat.sh` with the following command
 ```{bash, highlight=TRUE, eval=FALSE}
 #!/bin/bash
-metabat2 -i 2000kb.fa -a depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 -m 2000
+metabat2 -i /home/user/.../file.fa -depth.txt -o bins_dir/bin -t 20 --minCVSum 0 --saveCls -d -v --minCV 0.1 --noAdd
 ```
 `minCVsum` : assigning number of tetranucleotide frequency graphs, don’t grab negative numbers 
 `-m` : min size of contig to be considered for binning
@@ -274,6 +275,12 @@ If nohup exits there is likely a problem with the command you wrote in your shel
 
 # Metabolic pathway 
 
+## Metabolic
+[Github](https://github.com/AnantharamanLab/METABOLIC)
+
+```{bash, eval=FALSE}
+perl /home/.../METABOLIC/METABOLIC-G.pl -in /home/usr/.../folderwithFAA -o output/
+``` 
 # Other information 
 
 ## Workflow (alternative)
